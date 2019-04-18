@@ -5,7 +5,7 @@ import re
 from pymongo import MongoClient
 import urllib3
 
-cookie = {"Cookie": "_T_WM=7e017ab76d7fb79d228c67b4cd33e763; SUB=_2A25xsg5BDeRhGeVM6VER-SrJyjyIHXVTXJIJrDV6PUJbkdAKLUynkW1NTNRuCWg95Xq-PzGF6hrAPEQ3Vy4wJGFN; SUHB=0laF121NwHJqjw; SCF=AnHZACb_a-BqpR8ukjakYivCbygCl2HXw4X-zSJ6zhuJARj8JvB3hUfRlo2p-SqLb1gkSMGpyibtdUK5YlAyiuw.; SSOLoginState=1555463697"}
+cookie = {"Cookie": "your_cookie"}
 urllib3.disable_warnings()
 client = MongoClient()
 db = client['weibo']
