@@ -46,7 +46,7 @@ for i in range(1, pagenum+1):
 
     for con in content:
         name = con.a.string
-        content = con.find_all(attrs={'class': 'ctt'})[0].get_text()
+        content = con.find_all(attrs={'class': 'ctt'})[0].get_text().replace("'", "''")
         name_content_md5 = hashlib.md5((name + content).encode("utf-8"))
         time_device = con.find_all(attrs={'class': 'ct'})[0].get_text().replace(u'\xa0', u' ')
         if re.findall("\d+", con.find_all(attrs={'class': 'cc'})[0].a.string):
