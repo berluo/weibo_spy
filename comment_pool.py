@@ -50,8 +50,7 @@ if __name__ == '__main__':
     page_num = get_pagenum(url)
     pool = Pool()
     pool.map(main, [i for i in range(1, page_num+10)])
-    # for i in range(1, page_num+50):
-    #     pageurl = url + '&page=' + str(i)
-    #     get_item(pageurl)
-    #     print("page %d/%d completed" % (i, page_num))
+    #for i in range(1, page_num+50):
+    #    main(i)
+
 
