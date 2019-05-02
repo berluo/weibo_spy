@@ -87,3 +87,4 @@ if __name__ == '__main__':
         pageurl = url + '&page=' + str(i)
         get_comment_sql(pageurl,f)
         print("page %d/%d completed" % (i, page_num))
+    f.close()
