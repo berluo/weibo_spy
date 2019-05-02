@@ -34,11 +34,23 @@ def get_pagenum(url):
 
 def get_content(url, f):
     table_name = url[25:34]
+    now_time = time.asctime(time.localtime(time.time()))
     pagehtml = requests.get(url, cookies=cookie, verify=False).content
     soup = BeautifulSoup(pagehtml, 'lxml')
-    author = soup.find(attrs={'id': 'M_'}).div.a.string
-    content = soup.find(attrs={'id': 'M_'}).div.span.get_text().strip(':')
-    insert_sql = """INSERT INTO items (`serial_num`, `author`, `content`) VALUES ('%s', '%s', '%s');\n""" % (table_name, author, content)
+    if soup.find(attrs={'id': 'M_'}).find_all(attrs={'class': 'cmt'}):
+        author = soup.find(attrs={'id': 'M_'}).div.a.string
+        origin_author = soup.find(attrs={'id': 'M_'}).find_all(attrs={'class': 'cmt'})[0].a.string.strip('@')
+        origin_weibo = soup.find(attrs={'id': 'M_'}).find(attrs={'class': 'ctt'}).get_text()
+        content = soup.find(attrs={'id': 'M_'}).div.next_sibling.next_sibling.span.next_sibling.string.strip()
+        publish_time = soup.find(attrs={'id': 'M_'}).find(attrs={'class': 'ct'}).string
+    else:
+        author = soup.find(attrs={'id': 'M_'}).div.a.string
+        origin_author = ''
+        origin_weibo = ''
+        content = soup.find(attrs={'id': 'M_'}).div.span.get_text().strip(':')
+        publish_time = publish_time = soup.find(attrs={'id': 'M_'}).find(attrs={'class': 'ct'}).string
+    insert_sql = """INSERT INTO items (`serial_num`, `author`, `origin_author`, `origin_weibo`, `content`, `publish_time`, `now_time`) 
+    VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');\n""" % (table_name, author, origin_author, origin_weibo, content, publish_time, now_time)
     f.write(insert_sql)
 
 def get_comment_sql(url, f):
@@ -59,8 +71,9 @@ def get_comment_sql(url, f):
         insert_sql = """INSERT INTO %s_comment (`name`, `content`, `name_content_md5`, `time_device`, `up_num`) VALUES ('%s', '%s', '%s', '%s', %d);\n""" % (table_name, name, content, name_content_md5.hexdigest(), time_device, up_num)
         f.write(insert_sql)
 
+
 if __name__ == '__main__':
-    url = 'https://weibo.cn/comment/Hsj1Cj3iO?uid=1907214345&rl=0'
+    url = 'https://weibo.cn/comment/Hsi0BjcYF?uid=1638988052&rl=1&gid=4071451809558849'
     page_num = get_pagenum(url)
     table_name = url[25:34]
     f = open('%s.sql' % table_name, 'w', encoding='utf-8')
@@ -74,4 +87,3 @@ if __name__ == '__main__':
         pageurl = url + '&page=' + str(i)
         get_comment_sql(pageurl,f)
         print("page %d/%d completed" % (i, page_num))
-
