@@ -3,6 +3,7 @@ import requests
 import re
 import urllib3
 import hashlib
+import time
 
 cookie = {"Cookie": "your_cookies"}
 urllib3.disable_warnings()
@@ -83,8 +84,12 @@ if __name__ == '__main__':
     f.write(create_sql)
     f.write('/* ==============INSERT============== */\n')
     get_content(url, f)
+    f.close()
     for i in range(1, page_num+5):
         pageurl = url + '&page=' + str(i)
-        get_comment_sql(pageurl,f)
+        with open('%s.sql' % table_name, 'w', encoding='utf-8') as f:
+            get_comment_sql(pageurl,f)
         print("page %d/%d completed" % (i, page_num))
-    f.close()
+        print("Sleep 2 seconds")
+        time.sleep(2)
+    
