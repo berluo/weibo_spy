@@ -87,7 +87,7 @@ if __name__ == '__main__':
     f.close()
     for i in range(1, page_num+5):
         pageurl = url + '&page=' + str(i)
-        with open('%s.sql' % table_name, 'w', encoding='utf-8') as f:
+        with open('%s.sql' % table_name, 'a', encoding='utf-8') as f:
             get_comment_sql(pageurl,f)
         print("page %d/%d completed" % (i, page_num))
         print("Sleep 2 seconds")
