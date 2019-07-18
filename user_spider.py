@@ -7,7 +7,7 @@ import time
 
 urllib3.disable_warnings()
 headers = {
-    "Cookie": "SUB=_2A25wDDbADeRhGeVO71UQ9S7JzTiIHXVTD1qIrDV6PUJbktBeLWXzkW1NTWjzhn8FTMYEzf1rm3Qx-u8KpZ7ud2km; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWKx4GKS1LZG2o0Dakmml3Y5NHD95Q0ehBNeK-7SKqXWs4Dqcjqxc8fdGxD9PiSqPxLdsvXi--ciKnRiK.7; SUHB=0M2F6AvH-GMJn9; _T_WM=ccb145640cdc4cd7a2afdfcc550da613",
+    "Cookie": "your_cookies",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"
 }
 def create_table(table_name):
