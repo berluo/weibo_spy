@@ -1,0 +1,58 @@
+from bs4 import BeautifulSoup
+import requests
+import re
+import urllib3
+import hashlib
+import time
+
+
+cookie = {"Cookie": "your_cookie"}
+urllib3.disable_warnings()
+headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+}
+SLEEP_INTERVAL = 3
+
+
+def get_pagenum(url):
+    html = requests.get(url, headers=headers, cookies=cookie, verify=False).content
+    soup = BeautifulSoup(html, 'lxml')
+    # print(soup.prettify())
+    pagenum = int(soup. find(attrs={'id': 'pagelist'}).find(attrs={'type': 'hidden'})['value'])
+    print('Total page number is', pagenum)
+    return pagenum
+
+
+def get_content(url, f):
+	# table_name = url[29:37]
+	# print(table_name)
+	pagehtml = requests.get(url, cookies=cookie, verify=False).content
+	soup = BeautifulSoup(pagehtml, 'lxml')
+	# print(soup.prettify())
+	pattern = re.compile('C_*')
+	comment_list = soup.find_all(attrs={'id': pattern})
+	for comment in comment_list:
+		author = comment.a.get_text()
+		content = comment.find(attrs={'class': 'ctt'}).get_text()
+		publish_time = comment.find(attrs={'class': 'ct'}).get_text()
+		like_t = comment.find(attrs={'class': 'cc'}).get_text()
+		like = re.findall('(\d+)',like_t)[0]
+		f.write('author: %s' % author + '\n')
+		f.write('content: %s' % content + '\n')
+		f.write('publish_time: %s' % publish_time + '\n')
+		f.write('like: %s' % like + '\n')
+		f.write('********' + '\n')
+
+
+if __name__ == '__main__':
+    url = 'https://weibo.cn/comment/hot/ICED55yyf?rl=1'
+    page_num = get_pagenum(url)
+    print('page number is ' + str(page_num))
+    table_name = url[29:37]
+    f = open(table_name + '.txt', 'a', encoding='utf-8')
+    for i in range(1, page_num +2):
+    	pageurl = url + '&page=' + str(i)
+    	get_content(pageurl, f)
+    	print("page %d/%d completed" % (i, page_num))
+    	time.sleep(SLEEP_INTERVAL)
+    f.close()
