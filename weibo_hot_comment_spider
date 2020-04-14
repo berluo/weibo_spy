@@ -4,9 +4,10 @@ import re
 import urllib3
 import hashlib
 import time
+import json
 
 
-cookie = {"Cookie": "your_cookie"}
+cookie = {"Cookie": "ALF=1589448208; SCF=Ak63Pk2TcaX9nT7xwOyVSgeoryPnLgL6gZMpC835KLPTX52pUQ6OyW1CDNHDFO0u8Ofgm3O6vnm1nEk3raNfa2E.; SUHB=0nluZWOmUthen8; _T_WM=07eb8ca595bf515e86896ddcba8d2002; SSOLoginState=1586856279; SUB=_2A25zkfEHDeRhGeVM6VER-SrJyjyIHXVRfZ9PrDV6PUJbktANLVLSkW1NTNRuCVWFNak1OQ8exK1JWz8qHQCt6WBm; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhwMaBbsYRSYVrRKWI._oy_5JpX5K-hUgL.FoeEeoe71KBfeK52dJLoIRMLxKBLBonL1h5LxK-L12qLB-2LxKqL1KnLBo-LxKMLBKMLBo5LxK-LB.-L1hnLxK.L1K-LB.qLxKnLBoqLBoeLxKnLBoqLBoeLxKqL1-eL1h.LxK-L12BL1h2LxKBLB.2L1KBLxK-LB-BL1KMLxKML1-2L1hBLxKML12zL1KMLxK-LB-BL1K5t"}
 urllib3.disable_warnings()
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
@@ -30,29 +31,45 @@ def get_content(url, f):
 	soup = BeautifulSoup(pagehtml, 'lxml')
 	# print(soup.prettify())
 	pattern = re.compile('C_*')
-	comment_list = soup.find_all(attrs={'id': pattern})
-	for comment in comment_list:
+	comment_soup = soup.find_all(attrs={'id': pattern})
+	comment_list = []
+	for comment in comment_soup:
 		author = comment.a.get_text()
 		content = comment.find(attrs={'class': 'ctt'}).get_text()
 		publish_time = comment.find(attrs={'class': 'ct'}).get_text()
 		like_t = comment.find(attrs={'class': 'cc'}).get_text()
 		like = re.findall('(\d+)',like_t)[0]
-		f.write('author: %s' % author + '\n')
-		f.write('content: %s' % content + '\n')
-		f.write('publish_time: %s' % publish_time + '\n')
-		f.write('like: %s' % like + '\n')
-		f.write('********' + '\n')
+		comment_dict = {
+			'author': author,
+			'content': content,
+			'publish_time': publish_time,
+			'like': like
+		}
+		comment_list.append(comment_dict)
+	return comment_list
 
 
 if __name__ == '__main__':
-    url = 'https://weibo.cn/comment/hot/ICED55yyf?rl=1'
+    url = 'https://weibo.cn/comment/hot/ID0AXC6Ih?rl=1'
     page_num = get_pagenum(url)
     print('page number is ' + str(page_num))
     table_name = url[29:37]
     f = open(table_name + '.txt', 'a', encoding='utf-8')
+    FLAG = True
     for i in range(1, page_num +2):
     	pageurl = url + '&page=' + str(i)
-    	get_content(pageurl, f)
-    	print("page %d/%d completed" % (i, page_num))
-    	time.sleep(SLEEP_INTERVAL)
+    	a_list = get_content(pageurl, f)
+    	for item in a_list:
+    		if item['like'] == '0':
+    			print("It's time to stop.")
+    			FLAG = False
+    			break
+    		item1 = json.dumps(item, indent=4, sort_keys=True, ensure_ascii=False)
+    		f.write(item1 + '\n')
+    	if FLAG == False:
+    		break
+    	else:
+	    	print("page %d/%d completed" % (i, page_num))
+	    	time.sleep(SLEEP_INTERVAL)
+	    	continue
     f.close()
