@@ -10,6 +10,7 @@ urllib3.disable_warnings()
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
 }
+SLEEP_INTERVAL = 3
 
 def create_table(url):
     table_name = url[25:34]
@@ -90,6 +91,6 @@ if __name__ == '__main__':
         with open('%s.sql' % table_name, 'a', encoding='utf-8') as f:
             get_comment_sql(pageurl,f)
         print("page %d/%d completed" % (i, page_num))
-        print("Sleep 2 seconds")
-        time.sleep(2)
+        print("Sleep %d seconds" % SLEEP_INTERVAL)
+        time.sleep(SLEEP_INTERVAL)
     
